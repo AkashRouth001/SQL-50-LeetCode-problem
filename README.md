@@ -121,3 +121,172 @@ SELECT name from Customer
 WHERE (not referee_id = 2)
 OR (referee_id is null) ;
 ```
+
+-------------------------------------------------------------------------
+
+# [595 - Big Countries](https://leetcode.com/problems/big-countries/)
+## Table: World
+
+| Column Name | Type    |
+|-------------|---------|
+| name        | varchar |
+| continent   | varchar |
+| area        | int     |
+| population  | int     |
+| gdp         | bigint  |
+
+- **name** is the primary key (column with unique values) for this table.
+- Each row provides information about a country's name, its continent, area (in km²), population, and GDP.
+
+### Definition of "Big Country":
+A country is classified as **big** if:
+- Its area is at least 3,000,000 (3000000 km²), or
+- Its population is at least 25,000,000 (25000000).
+
+---
+
+## Problem Statement
+
+Write a solution to find the `name`, `population`, and `area` of the **big countries**.  
+Return the result table in any order.
+
+### Example 1:
+
+**Input:**  
+World table:
+
+| name        | continent | area    | population | gdp          |
+|-------------|-----------|---------|------------|--------------|
+| Afghanistan | Asia      | 652230  | 25500100   | 20343000000  |
+| Albania     | Europe    | 28748   | 2831741    | 12960000000  |
+| Algeria     | Africa    | 2381741 | 37100000   | 188681000000 |
+| Andorra     | Europe    | 468     | 78115      | 3712000000   |
+| Angola      | Africa    | 1246700 | 20609294   | 100990000000 |
+
+**Output:**  
+
+| name        | population | area    |
+|-------------|------------|---------|
+| Afghanistan | 25500100   | 652230  |
+| Algeria     | 37100000   | 2381741 |
+
+**Explanation:**  
+- Afghanistan is classified as a big country because its population exceeds 25,000,000.  
+- Algeria is classified as a big country because its population exceeds 25,000,000.  
+
+---
+
+## Answer
+```sql
+SELECT name, population, area
+FROM World
+WHERE area >= 3000000 OR population >= 25000000;
+```
+------------------------------------
+# [1148 - Article Views I](https://leetcode.com/problems/article-views-i)
+## Table: Views
+
+| Column Name   | Type    |
+|---------------|---------|
+| article_id    | int     |
+| author_id     | int     |
+| viewer_id     | int     |
+| view_date     | date    |
+
+- The table has no primary key and may contain duplicate rows.
+- Each row indicates that a `viewer_id` viewed an `article_id` authored by `author_id` on a specific `view_date`.
+- Note: `author_id` and `viewer_id` being equal implies that an author viewed their own article.
+
+---
+
+## Problem Statement
+
+Write a solution to find all the authors (`author_id`) who have viewed at least one of their own articles.  
+Return the result table sorted by `id` (author_id) in ascending order.
+
+---
+
+### Example 1:
+
+**Input:**  
+Views table:
+
+| article_id | author_id | viewer_id | view_date  |
+|------------|-----------|-----------|------------|
+| 1          | 3         | 5         | 2019-08-01 |
+| 1          | 3         | 6         | 2019-08-02 |
+| 2          | 7         | 7         | 2019-08-01 |
+| 2          | 7         | 6         | 2019-08-02 |
+| 4          | 7         | 1         | 2019-07-22 |
+| 3          | 4         | 4         | 2019-07-21 |
+| 3          | 4         | 4         | 2019-07-21 |
+
+**Output:**  
+
+| id   |
+|------|
+| 4    |
+| 7    |
+
+**Explanation:**  
+- Author `7` viewed their own article (`viewer_id = author_id = 7`).  
+- Author `4` viewed their own article (`viewer_id = author_id = 4`).  
+
+---
+
+## Answer
+```sql
+SELECT DISTINCT author_id AS id
+FROM Views
+WHERE  author_id = viewer_id
+ORDER BY id ASC;
+```
+------------------------------------------------
+## Table: Tweets
+
+| Column Name | Type    |
+|-------------|---------|
+| tweet_id    | int     |
+| content     | varchar |
+
+- **tweet_id** is the primary key for this table.
+- Each row contains the `tweet_id` and its `content` (the text of the tweet).
+
+---
+
+## Problem Statement
+
+Write a solution to find the IDs of the **invalid tweets**.  
+A tweet is invalid if the number of characters in its `content` exceeds 15.
+
+Return the result table in any order.
+
+---
+
+### Example 1:
+
+**Input:**  
+Tweets table:
+
+| tweet_id | content                           |
+|----------|-----------------------------------|
+| 1        | Let us Code                       |
+| 2        | More than fifteen chars are here! |
+
+**Output:**  
+
+| tweet_id |
+|----------|
+| 2        |
+
+**Explanation:**  
+- Tweet with `tweet_id = 1` has content length = 11. It is valid.  
+- Tweet with `tweet_id = 2` has content length = 33. It is invalid.  
+
+---
+
+## Answer
+```sql
+SELECT tweet_id FROM Tweets
+WHERE LENGTH(content)>15;
+```
