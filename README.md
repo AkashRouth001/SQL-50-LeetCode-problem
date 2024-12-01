@@ -352,3 +352,213 @@ FROM Employees AS E
 LEFT JOIN EmployeeUNI AS EU
 ON E.id = EU.id;
 ```
+-------------------------------
+## [1068. Product Sales Analysis I](https://leetcode.com/problems/product-sales-analysis-i/description/)  
+## Tables: Sales, Product  
+
+### Sales Table  
+
+| Column Name | Type  |  
+|-------------|-------|  
+| sale_id     | int   |  
+| product_id  | int   |  
+| year        | int   |  
+| quantity    | int   |  
+| price       | int   |  
+
+- **(sale_id, year)** is the primary key for this table.  
+- **product_id** is a foreign key referencing the `product_id` in the **Product** table.  
+- Each row represents a sale of the product with `product_id` in a specific year.  
+- The `price` is the unit price of the product.  
+
+### Product Table  
+
+| Column Name  | Type    |  
+|--------------|---------|  
+| product_id   | int     |  
+| product_name | varchar |  
+
+- **product_id** is the primary key for this table.  
+- Each row indicates the `product_name` corresponding to a `product_id`.  
+
+## Problem Statement  
+
+Write a solution to report the **product_name**, **year**, and **price** for each sale in the **Sales** table.  
+
+Return the resulting table in any order.  
+
+### Example 1:  
+
+**Input:**  
+Sales table:  
+
+| sale_id | product_id | year | quantity | price |  
+|---------|------------|------|----------|-------|  
+| 1       | 100        | 2008 | 10       | 5000  |  
+| 2       | 100        | 2009 | 12       | 5000  |  
+| 7       | 200        | 2011 | 15       | 9000  |  
+
+Product table:  
+
+| product_id | product_name |  
+|------------|--------------|  
+| 100        | Nokia        |  
+| 200        | Apple        |  
+| 300        | Samsung      |  
+
+**Output:**  
+
+| product_name | year  | price |  
+|--------------|-------|-------|  
+| Nokia        | 2008  | 5000  |  
+| Nokia        | 2009  | 5000  |  
+| Apple        | 2011  | 9000  |  
+
+**Explanation:**  
+- From `sale_id = 1`, Nokia was sold for 5000 in the year 2008.  
+- From `sale_id = 2`, Nokia was sold for 5000 in the year 2009.  
+- From `sale_id = 7`, Apple was sold for 9000 in the year 2011.  
+
+## Answer  
+```sql
+SELECT product_name,year, price
+FROM Sales AS S
+LEFT JOIN Product AS P
+ON S.product_id = P.product_id;
+```
+-----------------------------
+## [1581. Customer Who Visited but Did Not Make Any Transactions](https://leetcode.com/problems/customer-who-visited-but-did-not-make-any-transactions/description/)  
+## Tables: Visits, Transactions  
+
+### Visits Table  
+
+| Column Name | Type    |  
+|-------------|---------|  
+| visit_id    | int     |  
+| customer_id | int     |  
+
+- **visit_id** is the unique identifier for each visit.  
+- This table contains information about customers who visited the mall.  
+
+### Transactions Table  
+
+| Column Name    | Type    |  
+|----------------|---------|  
+| transaction_id | int     |  
+| visit_id       | int     |  
+| amount         | int     |  
+
+- **transaction_id** is the unique identifier for each transaction.  
+- This table contains details of transactions made during a specific `visit_id`.  
+
+## Problem Statement  
+
+Write a solution to find the **IDs of customers who visited the mall without making any transactions** and the number of such visits (`count_no_trans`) for each customer.  
+
+Return the result table sorted in any order.  
+
+### Example 1:  
+
+**Input:**  
+Visits table:  
+
+| visit_id | customer_id |  
+|----------|-------------|  
+| 1        | 23          |  
+| 2        | 9           |  
+| 4        | 30          |  
+| 5        | 54          |  
+| 6        | 96          |  
+| 7        | 54          |  
+| 8        | 54          |  
+
+Transactions table:  
+
+| transaction_id | visit_id | amount |  
+|----------------|----------|--------|  
+| 2              | 5        | 310    |  
+| 3              | 5        | 300    |  
+| 9              | 5        | 200    |  
+| 12             | 1        | 910    |  
+| 13             | 2        | 970    |  
+
+**Output:**  
+
+| customer_id | count_no_trans |  
+|-------------|----------------|  
+| 54          | 2              |  
+| 30          | 1              |  
+| 96          | 1              |  
+
+**Explanation:**  
+- Customer `23` visited once and made one transaction during the visit (`visit_id = 1`).  
+- Customer `9` visited once and made one transaction during the visit (`visit_id = 2`).  
+- Customer `30` visited once (`visit_id = 4`) without making any transactions.  
+- Customer `54` visited three times. They made transactions during one visit (`visit_id = 5`) and no transactions during two visits (`visit_ids = 7, 8`).  
+- Customer `96` visited once (`visit_id = 6`) without making any transactions.  
+
+## Answer  
+```sql
+SELECT V.customer_id , COUNT(*) AS count_no_trans
+FROM Visits AS V 
+LEFT JOIN 
+Transactions AS T
+ON V. visit_id = T. visit_id 
+WHERE 
+transaction_id IS NULL
+GROUP BY customer_id;
+```
+
+----------------------------------------
+## [197. Rising Temperature](https://leetcode.com/problems/rising-temperature/description/)  
+## Table: Weather  
+
+| Column Name   | Type    |  
+|---------------|---------|  
+| id            | int     |  
+| recordDate    | date    |  
+| temperature   | int     |  
+
+- **id** is the unique identifier for each record.  
+- **recordDate** is the date of the temperature recording.  
+- **temperature** is the recorded temperature for that date.  
+
+## Problem Statement  
+
+Write a solution to find all dates' **id** with higher temperatures compared to the previous day's temperature.  
+
+Return the result table in any order.  
+
+### Example 1:  
+
+**Input:**  
+Weather table:  
+
+| id  | recordDate  | temperature |  
+|-----|-------------|-------------|  
+| 1   | 2015-01-01  | 10          |  
+| 2   | 2015-01-02  | 25          |  
+| 3   | 2015-01-03  | 20          |  
+| 4   | 2015-01-04  | 30          |  
+
+**Output:**  
+
+| id  |  
+|-----|  
+| 2   |  
+| 4   |  
+
+**Explanation:**  
+- On **2015-01-02**, the temperature was higher than on the previous day (10 -> 25).  
+- On **2015-01-04**, the temperature was higher than on the previous day (20 -> 30).  
+
+## Answer  
+```sql
+SELECT W1.id 
+FROM Weather AS W1
+JOIN Weather AS W2
+ON DATE(W1.recordDate) = DATE(W2.recordDate) + INTERVAL 1 DAY
+WHERE W1.temperature > W2.temperature;
+
+```
+----------------------------------
