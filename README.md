@@ -1,7 +1,8 @@
 ![App Screenshot](https://github.com/AkashRouth001/SQL-50-LeetCode-problem/blob/ee5262e049a5e836cc9344b8645d8f338ff6267d/Screenshot%202024-11-27%20210901.png)
 # SQL 50 LeetCode problem
 Solutions for [SQL 50 Study Plan](https://leetcode.com/studyplan/top-sql-50/) on LeetCode
-# [1757 - Recyclable and Low Fat Products](https://leetcode.com/problems/recyclable-and-low-fat-products/)
+# Select
+## [1757 - Recyclable and Low Fat Products](https://leetcode.com/problems/recyclable-and-low-fat-products/)
 
 ## Table: Products
 
@@ -174,8 +175,6 @@ World table:
 - Afghanistan is classified as a big country because its population exceeds 25,000,000.  
 - Algeria is classified as a big country because its population exceeds 25,000,000.  
 
----
-
 ## Answer
 ```sql
 SELECT name, population, area
@@ -242,6 +241,7 @@ WHERE  author_id = viewer_id
 ORDER BY id ASC;
 ```
 ------------------------------------------------
+# [1683. Invalid Tweets](https://leetcode.com/problems/invalid-tweets/description/?envType=study-plan-v2&envId=top-sql-50)
 ## Table: Tweets
 
 | Column Name | Type    |
