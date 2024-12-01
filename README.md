@@ -68,7 +68,7 @@ WHERE (low_fats = 'Y') AND (recyclable = 'Y');
 
 ---------------------------------------
   
-# [584 - Find Customer Referee](https://leetcode.com/problems/find-customer-referee)
+## [584 - Find Customer Referee](https://leetcode.com/problems/find-customer-referee)
 
 ## Table: Customer
 
@@ -125,7 +125,7 @@ OR (referee_id is null) ;
 
 -------------------------------------------------------------------------
 
-# [595 - Big Countries](https://leetcode.com/problems/big-countries/)
+## [595 - Big Countries](https://leetcode.com/problems/big-countries/)
 ## Table: World
 
 | Column Name | Type    |
@@ -182,7 +182,7 @@ FROM World
 WHERE area >= 3000000 OR population >= 25000000;
 ```
 ------------------------------------
-# [1148 - Article Views I](https://leetcode.com/problems/article-views-i)
+## [1148 - Article Views I](https://leetcode.com/problems/article-views-i)
 ## Table: Views
 
 | Column Name   | Type    |
@@ -241,7 +241,7 @@ WHERE  author_id = viewer_id
 ORDER BY id ASC;
 ```
 ------------------------------------------------
-# [1683. Invalid Tweets](https://leetcode.com/problems/invalid-tweets/description/?envType=study-plan-v2&envId=top-sql-50)
+## [1683. Invalid Tweets](https://leetcode.com/problems/invalid-tweets/description/?envType=study-plan-v2&envId=top-sql-50)
 ## Table: Tweets
 
 | Column Name | Type    |
