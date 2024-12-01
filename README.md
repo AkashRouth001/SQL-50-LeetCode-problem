@@ -144,8 +144,6 @@ A country is classified as **big** if:
 - Its area is at least 3,000,000 (3000000 km²), or
 - Its population is at least 25,000,000 (25000000).
 
----
-
 ## Problem Statement
 
 Write a solution to find the `name`, `population`, and `area` of the **big countries**.  
@@ -196,14 +194,10 @@ WHERE area >= 3000000 OR population >= 25000000;
 - Each row indicates that a `viewer_id` viewed an `article_id` authored by `author_id` on a specific `view_date`.
 - Note: `author_id` and `viewer_id` being equal implies that an author viewed their own article.
 
----
-
 ## Problem Statement
 
 Write a solution to find all the authors (`author_id`) who have viewed at least one of their own articles.  
 Return the result table sorted by `id` (author_id) in ascending order.
-
----
 
 ### Example 1:
 
@@ -231,8 +225,6 @@ Views table:
 - Author `7` viewed their own article (`viewer_id = author_id = 7`).  
 - Author `4` viewed their own article (`viewer_id = author_id = 4`).  
 
----
-
 ## Answer
 ```sql
 SELECT DISTINCT author_id AS id
@@ -252,16 +244,12 @@ ORDER BY id ASC;
 - **tweet_id** is the primary key for this table.
 - Each row contains the `tweet_id` and its `content` (the text of the tweet).
 
----
-
 ## Problem Statement
 
 Write a solution to find the IDs of the **invalid tweets**.  
 A tweet is invalid if the number of characters in its `content` exceeds 15.
 
 Return the result table in any order.
-
----
 
 ### Example 1:
 
@@ -282,8 +270,6 @@ Tweets table:
 **Explanation:**  
 - Tweet with `tweet_id = 1` has content length = 11. It is valid.  
 - Tweet with `tweet_id = 2` has content length = 33. It is invalid.  
-
----
 
 ## Answer
 ```sql
