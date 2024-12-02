@@ -975,3 +975,219 @@ ON s.user_id = c.user_id
 GROUP BY s.user_id;  
 ```
 ----------------------------
+# Basic Aggregate Functions
+## [620. Not Boring Movies](https://leetcode.com/problems/not-boring-movies/description/?envType=study-plan-v2&envId=top-sql-50)  
+## Table: Cinema  
+
+| Column Name | Type    |  
+|-------------|---------|  
+| id          | int     |  
+| movie       | varchar |  
+| description | varchar |  
+| rating      | float   |  
+
+- **id** is the primary key for this table.  
+- Each row contains information about the name of a movie, its genre, and its rating.  
+- **rating** is a 2 decimal places float in the range [0, 10].  
+
+## Problem Statement  
+
+Write a solution to report the movies with an odd-numbered **id** and a **description** that is not "boring".  
+
+Return the result table ordered by **rating** in descending order.  
+
+### Example 1:  
+
+**Input:**  
+Cinema table:  
+
+| id | movie      | description | rating |  
+|----|------------|-------------|--------|  
+| 1  | War        | great 3D    | 8.9    |  
+| 2  | Science    | fiction     | 8.5    |  
+| 3  | irish      | boring      | 6.2    |  
+| 4  | Ice song   | Fantacy     | 8.6    |  
+| 5  | House card | Interesting | 9.1    |  
+
+**Output:**  
+
+| id | movie      | description | rating |  
+|----|------------|-------------|--------|  
+| 5  | House card | Interesting | 9.1    |  
+| 1  | War        | great 3D    | 8.9    |  
+
+**Explanation:**  
+- We have three movies with odd-numbered IDs: 1, 3, and 5.  
+- The movie with **id = 3** is "boring," so it is excluded.  
+- The result is sorted by **rating** in descending order.  
+
+## Answer  
+```sql
+ SELECT * FROM Cinema
+WHERE (id %2) != 0 
+AND
+description != 'boring'
+ORDER BY rating DESC
+```
+------------------------------------------
+## [1251. Average Selling Price](https://leetcode.com/problems/average-selling-price/description/?envType=study-plan-v2&envId=top-sql-50)  
+## Table: Prices  
+
+| Column Name  | Type |  
+|--------------|------|  
+| product_id   | int  |  
+| start_date   | date |  
+| end_date     | date |  
+| price        | int  |  
+
+- **(product_id, start_date, end_date)** is the primary key for this table.  
+- Each row indicates the price of the product_id during the period from **start_date** to **end_date**.  
+- There are no overlapping periods for the same product_id.  
+
+## Table: UnitsSold  
+
+| Column Name   | Type |  
+|---------------|------|  
+| product_id    | int  |  
+| purchase_date | date |  
+| units         | int  |  
+
+- This table may contain duplicate rows.  
+- Each row indicates the date, units, and product_id of each product sold.  
+
+## Problem Statement  
+
+Write a solution to find the **average selling price** for each product.  
+
+- The **average_price** should be rounded to 2 decimal places.  
+- If a product does not have any sold units, its average selling price is assumed to be **0**.  
+
+Return the result table in any order.  
+
+### Example 1:  
+
+**Input:**  
+
+**Prices table:**  
+
+| product_id | start_date | end_date   | price |  
+|------------|------------|------------|-------|  
+| 1          | 2019-02-17 | 2019-02-28 | 5     |  
+| 1          | 2019-03-01 | 2019-03-22 | 20    |  
+| 2          | 2019-02-01 | 2019-02-20 | 15    |  
+| 2          | 2019-02-21 | 2019-03-31 | 30    |  
+
+**UnitsSold table:**  
+
+| product_id | purchase_date | units |  
+|------------|---------------|-------|  
+| 1          | 2019-02-25    | 100   |  
+| 1          | 2019-03-01    | 15    |  
+| 2          | 2019-02-10    | 200   |  
+| 2          | 2019-03-22    | 30    |  
+
+**Output:**  
+
+| product_id | average_price |  
+|------------|---------------|  
+| 1          | 6.96          |  
+| 2          | 16.96         |  
+
+**Explanation:**  
+
+- Average selling price = Total Price of Product / Number of products sold.  
+- For product 1: ((100 \* 5) + (15 \* 20)) / 115 = 6.96.  
+- For product 2: ((200 \* 15) + (30 \* 30)) / 230 = 16.96.  
+
+## Answer  
+```sql
+SELECT 
+    P.product_id, 
+    ROUND(COALESCE(SUM(P.price * U.units) / NULLIF(SUM(U.units), 0), 0), 2) AS average_price
+FROM 
+    Prices AS P
+LEFT JOIN 
+    UnitsSold AS U
+ON 
+    P.product_id = U.product_id
+    AND U.purchase_date BETWEEN P.start_date AND P.end_date
+GROUP BY 
+    P.product_id;
+
+```
+----------------------------------------------
+## [1075. Project Employees I](https://leetcode.com/problems/project-employees-i/description/?envType=study-plan-v2&envId=top-sql-50)  
+## Table: Project  
+
+| Column Name | Type |  
+|-------------|------|  
+| project_id  | int  |  
+| employee_id | int  |  
+
+- **(project_id, employee_id)** is the primary key of this table.  
+- **employee_id** is a foreign key referencing the Employee table.  
+- Each row indicates that the employee with **employee_id** is working on the project with **project_id**.  
+
+## Table: Employee  
+
+| Column Name      | Type    |  
+|------------------|---------|  
+| employee_id      | int     |  
+| name             | varchar |  
+| experience_years | int     |  
+
+- **employee_id** is the primary key of this table.  
+- **experience_years** is guaranteed not to be NULL.  
+- Each row contains information about an employee.  
+
+## Problem Statement  
+
+Write an SQL query to report the **average experience years** of all the employees for each project, rounded to 2 decimal places.  
+
+Return the result table in any order.  
+
+### Example 1:  
+
+**Input:**  
+
+**Project table:**  
+
+| project_id | employee_id |  
+|------------|-------------|  
+| 1          | 1           |  
+| 1          | 2           |  
+| 1          | 3           |  
+| 2          | 1           |  
+| 2          | 4           |  
+
+**Employee table:**  
+
+| employee_id | name   | experience_years |  
+|-------------|--------|------------------|  
+| 1           | Khaled | 3                |  
+| 2           | Ali    | 2                |  
+| 3           | John   | 1                |  
+| 4           | Doe    | 2                |  
+
+**Output:**  
+
+| project_id | average_years |  
+|------------|---------------|  
+| 1          | 2.00          |  
+| 2          | 2.50          |  
+
+**Explanation:**  
+
+- For **project 1**, the average experience years are \((3 + 2 + 1) / 3 = 2.00\).  
+- For **project 2**, the average experience years are \((3 + 2) / 2 = 2.50\).  
+
+## Answer  
+```sql
+SELECT P.project_id , 
+ROUND(AVG(E.experience_years),2) AS average_years
+FROM Project AS P
+LEFT JOIN Employee AS E
+ON P.employee_id = E.employee_id
+GROUP BY P.project_id
+```
+------------------------------------
