@@ -1191,3 +1191,148 @@ ON P.employee_id = E.employee_id
 GROUP BY P.project_id
 ```
 ------------------------------------
+## [1633. Percentage of Users Attended a Contest](https://leetcode.com/problems/percentage-of-users-attended-a-contest/description/?envType=study-plan-v2&envId=top-sql-50)  
+## Table: Users  
+
+| Column Name | Type    |  
+|-------------|---------|  
+| user_id     | int     |  
+| user_name   | varchar |  
+
+- **user_id** is the primary key for this table.  
+- Each row contains the name and the ID of a user.  
+
+## Table: Register  
+
+| Column Name | Type |  
+|-------------|------|  
+| contest_id  | int  |  
+| user_id     | int  |  
+
+- **(contest_id, user_id)** is the primary key for this table.  
+- Each row contains the ID of a user and the contest they registered for.  
+
+## Problem Statement  
+
+Write an SQL query to find the **percentage of users registered** in each contest, rounded to two decimal places.  
+
+Return the result table:  
+- Ordered by **percentage** in descending order.  
+- In case of a tie, order by **contest_id** in ascending order.  
+
+### Example 1:  
+
+**Input:**  
+
+**Users table:**  
+
+| user_id | user_name |  
+|---------|-----------|  
+| 6       | Alice     |  
+| 2       | Bob       |  
+| 7       | Alex      |  
+
+**Register table:**  
+
+| contest_id | user_id |  
+|------------|---------|  
+| 215        | 6       |  
+| 209        | 2       |  
+| 208        | 2       |  
+| 210        | 6       |  
+| 208        | 6       |  
+| 209        | 7       |  
+| 209        | 6       |  
+| 215        | 7       |  
+| 208        | 7       |  
+| 210        | 2       |  
+| 207        | 2       |  
+| 210        | 7       |  
+
+**Output:**  
+
+| contest_id | percentage |  
+|------------|------------|  
+| 208        | 100.0      |  
+| 209        | 100.0      |  
+| 210        | 100.0      |  
+| 215        | 66.67      |  
+| 207        | 33.33      |  
+
+**Explanation:**  
+- All users registered in contests **208**, **209**, and **210**, making their percentage **100%**.  
+- Contests **208**, **209**, and **210** are sorted by **contest_id** in ascending order.  
+- Contests **215** had **2 out of 3 users**, so the percentage is \((2/3) \times 100 = 66.67\).  
+- Contest **207** had only **1 user** registered, so the percentage is \((1/3) \times 100 = 33.33\).  
+
+## Answer  
+```sql
+SELECT R.contest_id,
+ROUND((COUNT(R.user_id)/(SELECT COUNT(user_id) FROM Users ))*100,2) AS percentage
+FROM Register AS R 
+GROUP BY R.contest_id
+ORDER BY percentage DESC, R.contest_id ASC;
+```
+-----------------------------------
+## [1211. Queries Quality and Percentage](https://leetcode.com/problems/queries-quality-and-percentage/)  
+### Table: Queries  
+
+| Column Name | Type    |  
+|-------------|---------|  
+| query_name  | varchar |  
+| result      | varchar |  
+| position    | int     |  
+| rating      | int     |  
+
+- Duplicate rows may exist in the table.  
+- **position** values are integers from 1 to 500.  
+- **rating** values are integers from 1 to 5.  
+- A query is considered **poor** if its rating is less than 3.  
+
+### Problem Statement  
+
+Write an SQL query to calculate the following for each `query_name`:  
+1. **Quality**: The average ratio of `rating / position`.  
+2. **Poor Query Percentage**: The percentage of queries with a `rating < 3`.  
+
+Both `quality` and `poor_query_percentage` should be **rounded to 2 decimal places**.  
+
+Return the results table in any order.  
+
+### Example  
+
+#### Input:  
+**Queries table:**  
+
+| query_name | result            | position | rating |  
+|------------|-------------------|----------|--------|  
+| Dog        | Golden Retriever  | 1        | 5      |  
+| Dog        | German Shepherd   | 2        | 5      |  
+| Dog        | Mule              | 200      | 1      |  
+| Cat        | Shirazi           | 5        | 2      |  
+| Cat        | Siamese           | 3        | 3      |  
+| Cat        | Sphynx            | 7        | 4      |  
+
+#### Output:  
+| query_name | quality | poor_query_percentage |  
+|------------|---------|-----------------------|  
+| Dog        | 2.50    | 33.33                 |  
+| Cat        | 0.66    | 33.33                 |  
+
+#### Explanation:  
+- **Dog**:  
+  - Quality: \(((5 / 1) + (5 / 2) + (1 / 200)) / 3 = 2.50\)  
+  - Poor Query Percentage: \((1 / 3) \times 100 = 33.33\)%  
+- **Cat**:  
+  - Quality: \(((2 / 5) + (3 / 3) + (4 / 7)) / 3 = 0.66\)  
+  - Poor Query Percentage: \((1 / 3) \times 100 = 33.33\)%  
+
+## Answer  
+```sql
+SELECT query_name,
+       ROUND(AVG(rating / position), 2) AS quality,
+       ROUND((SUM(CASE WHEN rating < 3 THEN 1 ELSE 0 END) / COUNT(rating))*100, 2) AS poor_query_percentage
+FROM Queries
+WHERE query_name IS NOT NULL
+GROUP BY query_name;
+```  
