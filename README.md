@@ -1540,3 +1540,5 @@ FROM Activity A
 LEFT JOIN NextLogin N ON A.player_id = N.player_id;
 
 ```
+---------------------------------------------
+# Sorting and Grouping
