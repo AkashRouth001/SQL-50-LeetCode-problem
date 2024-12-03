@@ -1336,3 +1336,207 @@ FROM Queries
 WHERE query_name IS NOT NULL
 GROUP BY query_name;
 ```  
+-----------------------------------------
+## [1193. Monthly Transactions I](https://leetcode.com/problems/monthly-transactions-i/description/)
+## Table: Transactions
+
+| Column Name   | Type    |
+|---------------|---------|
+| id            | int     |
+| country       | varchar |
+| state         | enum    |
+| amount        | int     |
+| trans_date    | date    |
+
+- **id** is the primary key of this table.  
+- The table contains information about incoming transactions.  
+- The `state` column is an enum of type ["approved", "declined"].  
+
+## Problem Statement
+
+Write an SQL query to find for each month and country:  
+1. The total number of transactions.  
+2. The total number of approved transactions.  
+3. The total amount of all transactions.  
+4. The total amount of approved transactions.  
+
+Return the result table in any order.  
+
+### Example 1:
+
+**Input:**  
+Transactions table:
+
+| id   | country | state    | amount | trans_date |
+|------|---------|----------|--------|------------|
+| 121  | US      | approved | 1000   | 2018-12-18 |
+| 122  | US      | declined | 2000   | 2018-12-19 |
+| 123  | US      | approved | 2000   | 2019-01-01 |
+| 124  | DE      | approved | 2000   | 2019-01-07 |
+
+**Output:**  
+
+| month    | country | trans_count | approved_count | trans_total_amount | approved_total_amount |
+|----------|---------|-------------|----------------|--------------------|-----------------------|
+| 2018-12  | US      | 2           | 1              | 3000               | 1000                  |
+| 2019-01  | US      | 1           | 1              | 2000               | 2000                  |
+| 2019-01  | DE      | 1           | 1              | 2000               | 2000                  |
+
+**Explanation:**  
+- In December 2018, the US had 2 transactions totaling 3000, of which 1 was approved, totaling 1000.  
+- In January 2019, the US had 1 approved transaction totaling 2000.  
+- In January 2019, Germany (DE) had 1 approved transaction totaling 2000.  
+
+## Answer
+```sql
+SELECT 
+    DATE_FORMAT(trans_date, '%Y-%m') AS month,
+    country,
+    COUNT(*) AS trans_count,
+    SUM(CASE WHEN state = 'approved' THEN 1 ELSE 0 END) AS approved_count,
+    SUM(amount) AS trans_total_amount,
+    SUM(CASE WHEN state = 'approved' THEN amount ELSE 0 END) AS approved_total_amount
+FROM 
+    Transactions
+GROUP BY 
+    DATE_FORMAT(trans_date, '%Y-%m'), country;
+```
+-----------------------------------------
+## [1174. Immediate Food Delivery II](https://leetcode.com/problems/immediate-food-delivery-ii/description/)
+## Table: Delivery
+
+| Column Name                 | Type    |
+|-----------------------------|---------|
+| delivery_id                 | int     |
+| customer_id                 | int     |
+| order_date                  | date    |
+| customer_pref_delivery_date | date    |
+
+- **delivery_id** is the column of unique values in this table.  
+- The table contains information about food delivery orders.  
+- An order is considered **immediate** if the `customer_pref_delivery_date` is the same as the `order_date`; otherwise, it is considered **scheduled**.  
+- The **first order** of a customer is the one with the earliest `order_date`.  
+- It is guaranteed that each customer has exactly one first order.
+
+## Problem Statement
+
+Write an SQL query to calculate the percentage of **immediate orders** among the first orders of all customers. The result should be rounded to 2 decimal places.
+
+### Example 1:
+
+**Input:**  
+Delivery table:
+
+| delivery_id | customer_id | order_date | customer_pref_delivery_date |
+|-------------|-------------|------------|-----------------------------|
+| 1           | 1           | 2019-08-01 | 2019-08-02                  |
+| 2           | 2           | 2019-08-02 | 2019-08-02                  |
+| 3           | 1           | 2019-08-11 | 2019-08-12                  |
+| 4           | 3           | 2019-08-24 | 2019-08-24                  |
+| 5           | 3           | 2019-08-21 | 2019-08-22                  |
+| 6           | 2           | 2019-08-11 | 2019-08-13                  |
+| 7           | 4           | 2019-08-09 | 2019-08-09                  |
+
+**Output:**  
+
+| immediate_percentage |
+|-----------------------|
+| 50.00                |
+
+**Explanation:**  
+- Customer **1**: First order (`delivery_id = 1`) is scheduled.  
+- Customer **2**: First order (`delivery_id = 2`) is immediate.  
+- Customer **3**: First order (`delivery_id = 5`) is scheduled.  
+- Customer **4**: First order (`delivery_id = 7`) is immediate.  
+
+Out of 4 customers, 2 have immediate first orders. The percentage is \( \frac{2}{4} \times 100 = 50.00 \).  
+
+## Answer
+```sql
+ WITH FirstOrders AS (
+    SELECT 
+        customer_id,
+        delivery_id,
+        order_date,
+        customer_pref_delivery_date,
+        ROW_NUMBER() OVER (PARTITION BY customer_id ORDER BY order_date) AS rn
+    FROM Delivery
+)
+SELECT 
+    ROUND(
+        SUM(CASE WHEN order_date = customer_pref_delivery_date THEN 1 ELSE 0 END) 
+        / COUNT(*) * 100, 2
+    ) AS immediate_percentage
+FROM FirstOrders
+WHERE rn = 1;
+
+```
+---------------------------------------------
+## [550. Game Play Analysis IV](https://leetcode.com/problems/game-play-analysis-iv/description/)
+## Table: Activity
+
+| Column Name  | Type    |
+|--------------|---------|
+| player_id    | int     |
+| device_id    | int     |
+| event_date   | date    |
+| games_played | int     |
+
+- **(player_id, event_date)** is the primary key for this table.  
+- Each row represents a player's activity on a specific date, including the device used and the number of games played.
+
+## Problem Statement
+
+Write an SQL query to calculate the fraction of players who logged in again on the day immediately following their first login date.  
+- Count the number of players with at least two consecutive login days starting from their first login date.  
+- Divide that count by the total number of players.  
+
+Return the result rounded to **2 decimal places**.
+
+### Example 1:
+
+**Input:**  
+Activity table:
+
+| player_id | device_id | event_date | games_played |
+|-----------|-----------|------------|--------------|
+| 1         | 2         | 2016-03-01 | 5            |
+| 1         | 2         | 2016-03-02 | 6            |
+| 2         | 3         | 2017-06-25 | 1            |
+| 3         | 1         | 2016-03-02 | 0            |
+| 3         | 4         | 2018-07-03 | 5            |
+
+**Output:**  
+
+| fraction |
+|----------|
+| 0.33     |
+
+**Explanation:**  
+- Player **1**: First login on `2016-03-01`. Logged in again on `2016-03-02`.  
+- Player **2**: First login on `2017-06-25`. No login on `2017-06-26`.  
+- Player **3**: First login on `2016-03-02`. No login on `2016-03-03`.  
+
+Only **1 out of 3 players** logged in consecutively after their first day. The fraction is \( \frac{1}{3} = 0.33 \).
+
+## Answer
+```sql
+WITH FirstLogin AS (
+    -- Find the first login date for each player
+    SELECT player_id, MIN(event_date) AS first_login
+    FROM Activity
+    GROUP BY player_id
+),
+NextLogin AS (
+    -- Find the players who logged in on the next day after their first login
+    SELECT A.player_id
+    FROM Activity A
+    JOIN FirstLogin F ON A.player_id = F.player_id
+    WHERE A.event_date = DATE_ADD(F.first_login, INTERVAL 1 DAY)
+)
+-- Calculate the fraction of players who logged in again the next day
+SELECT ROUND(COUNT(DISTINCT N.player_id) / COUNT(DISTINCT A.player_id), 2) AS fraction
+FROM Activity A
+LEFT JOIN NextLogin N ON A.player_id = N.player_id;
+
+```
