@@ -1542,3 +1542,259 @@ LEFT JOIN NextLogin N ON A.player_id = N.player_id;
 ```
 ---------------------------------------------
 # Sorting and Grouping
+## [2356 - Number of Unique Subjects Taught by Each Teacher](https://leetcode.com/problems/number-of-unique-subjects-taught-by-each-teacher)
+
+## Table: Teacher
+
+| Column Name | Type    |
+|-------------|---------|
+| teacher_id  | int     |
+| subject_id  | int     |
+| dept_id     | int     |
+
+- `(subject_id, dept_id)` is the primary key of this table.
+- Each row in this table indicates that the teacher with `teacher_id` teaches the subject `subject_id` in the department `dept_id`.
+
+## Problem Statement
+
+Write a solution to calculate the number of **unique subjects** each teacher teaches in the university.
+
+Return the result table in any order.
+
+The result format is shown in the following example:
+
+### Example 1:
+
+**Input:**  
+Teacher table:  
+
+| teacher_id | subject_id | dept_id |
+|------------|------------|---------|
+| 1          | 2          | 3       |
+| 1          | 2          | 4       |
+| 1          | 3          | 3       |
+| 2          | 1          | 1       |
+| 2          | 2          | 1       |
+| 2          | 3          | 1       |
+| 2          | 4          | 1       |
+
+**Output:**  
+
+| teacher_id | cnt |
+|------------|-----|
+| 1          | 2   |
+| 2          | 4   |
+
+**Explanation:**  
+- Teacher `1`:  
+  - They teach subject `2` in departments `3` and `4` (unique subject: `2`).  
+  - They teach subject `3` in department `3` (unique subject: `3`).  
+  - Total unique subjects: `2`.  
+- Teacher `2`:  
+  - They teach subject `1`, `2`, `3`, and `4` in department `1`.  
+  - Total unique subjects: `4`.
+
+## ANSWER
+```sql
+# Write your MySQL query statement below
+select teacher_id , 
+count(distinct subject_id ) as cnt
+from Teacher
+group by teacher_id
+```
+-----------------------------------------------
+## [1141 - User Activity for the Past 30 Days I](https://leetcode.com/problems/user-activity-for-the-past-30-days-i)
+
+## Table: Activity
+
+| Column Name   | Type    |
+|---------------|---------|
+| user_id       | int     |
+| session_id    | int     |
+| activity_date | date    |
+| activity_type | enum    |
+
+- The `activity_type` column is an ENUM of type `('open_session', 'end_session', 'scroll_down', 'send_message')`.
+- The table may have duplicate rows.
+- Each session belongs to exactly one user.
+- The table shows user activities for a social media website.
+
+## Problem Statement
+
+Write a solution to find the **daily active user count** for a period of **30 days** ending on `2019-07-27` inclusively.  
+A user was considered active on a specific day if they made **at least one activity** on that day.
+
+Return the result table in any order.
+
+The result format is shown in the following example:
+
+### Example 1:
+
+**Input:**  
+Activity table:  
+
+| user_id | session_id | activity_date | activity_type |
+|---------|------------|---------------|---------------|
+| 1       | 1          | 2019-07-20    | open_session  |
+| 1       | 1          | 2019-07-20    | scroll_down   |
+| 1       | 1          | 2019-07-20    | end_session   |
+| 2       | 4          | 2019-07-20    | open_session  |
+| 2       | 4          | 2019-07-21    | send_message  |
+| 2       | 4          | 2019-07-21    | end_session   |
+| 3       | 2          | 2019-07-21    | open_session  |
+| 3       | 2          | 2019-07-21    | send_message  |
+| 3       | 2          | 2019-07-21    | end_session   |
+| 4       | 3          | 2019-06-25    | open_session  |
+| 4       | 3          | 2019-06-25    | end_session   |
+
+**Output:**  
+
+| day        | active_users |
+|------------|--------------|
+| 2019-07-20 | 2            |
+| 2019-07-21 | 2            |
+
+**Explanation:**  
+- On `2019-07-20`, users `1` and `2` were active.
+- On `2019-07-21`, users `2` and `3` were active.
+- Days outside the period of the last 30 days ending on `2019-07-27` are excluded.
+
+## ANSWER
+```sql
+SELECT activity_date AS day ,COUNT(DISTINCT user_id) AS active_users
+FROM Activity
+WHERE activity_date BETWEEN DATE_SUB('2019-07-27', INTERVAL 29 DAY) AND '2019-07-27'
+GROUP BY activity_date
+```
+------------------------------------
+## [1070 - Product Sales Analysis III](https://leetcode.com/problems/product-sales-analysis-iii)
+
+## Table: Sales
+
+| Column Name | Type  |
+|-------------|-------|
+| sale_id     | int   |
+| product_id  | int   |
+| year        | int   |
+| quantity    | int   |
+| price       | int   |
+
+- `(sale_id, year)` is the primary key of this table.
+- `product_id` is a foreign key referencing the `Product` table.
+- Each row in this table shows a sale of `product_id` in a specific `year`.
+- `price` represents the price per unit.
+
+## Table: Product
+
+| Column Name  | Type    |
+|--------------|---------|
+| product_id   | int     |
+| product_name | varchar |
+
+- `product_id` is the primary key of this table.
+- Each row in this table indicates the product name for each product.
+
+## Problem Statement
+
+Write a solution to select the `product_id`, the first year of sale (`first_year`), `quantity`, and `price` for the **first year** of every product sold.
+
+Return the result table in any order.
+
+### Example 1:
+
+**Input:**  
+
+**Sales table:**  
+
+| sale_id | product_id | year | quantity | price |
+|---------|------------|------|----------|-------|
+| 1       | 100        | 2008 | 10       | 5000  |
+| 2       | 100        | 2009 | 12       | 5000  |
+| 7       | 200        | 2011 | 15       | 9000  |
+
+**Product table:**  
+
+| product_id | product_name |
+|------------|--------------|
+| 100        | Nokia        |
+| 200        | Apple        |
+| 300        | Samsung      |
+
+**Output:**  
+
+| product_id | first_year | quantity | price |
+|------------|------------|----------|-------|
+| 100        | 2008       | 10       | 5000  |
+| 200        | 2011       | 15       | 9000  |
+
+**Explanation:**  
+- Product `100` was first sold in the year `2008` with a quantity of `10` and a price of `5000`.
+- Product `200` was first sold in the year `2011` with a quantity of `15` and a price of `9000`.
+
+## ANSWER
+```sql
+SELECT s.product_id, s.year AS first_year, s.quantity, s.price
+FROM Sales s
+JOIN (
+  SELECT product_id, MIN(year) AS year 
+  FROM sales 
+  GROUP BY product_id
+  ) p
+ON s.product_id = p.product_id
+AND s.year = p.year
+```
+---------------------------------
+## [596 - Classes More Than 5 Students](https://leetcode.com/problems/classes-more-than-5-students)
+
+## Table: Courses
+
+| Column Name | Type    |
+|-------------|---------|
+| student     | varchar |
+| class       | varchar |
+
+- `(student, class)` is the primary key of this table.
+- Each row indicates the name of a student and the class they are enrolled in.
+
+## Problem Statement
+
+Write a solution to find all the classes that have **at least five students**.
+
+Return the result table in any order.
+
+### Example 1:
+
+**Input:**  
+
+**Courses table:**  
+
+| student | class    |
+|---------|----------|
+| A       | Math     |
+| B       | English  |
+| C       | Math     |
+| D       | Biology  |
+| E       | Math     |
+| F       | Computer |
+| G       | Math     |
+| H       | Math     |
+| I       | Math     |
+
+**Output:**  
+
+| class   |
+|---------|
+| Math    |
+
+**Explanation:**  
+- `Math` has 6 students, so it is included in the output.
+- `English`, `Biology`, and `Computer` each have only 1 student, so they are excluded.
+
+## ANSWER
+```sql
+SELECT class
+FROM Courses
+GROUP BY class
+HAVING COUNT(student) > 4;
+```
+--------------------------------------------------------
