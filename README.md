@@ -1798,3 +1798,219 @@ GROUP BY class
 HAVING COUNT(student) > 4;
 ```
 --------------------------------------------------------
+## [1729 - Find Followers Count](https://leetcode.com/problems/find-followers-count)
+
+## Table: Followers
+
+| Column Name | Type |
+|-------------|------|
+| user_id     | int  |
+| follower_id | int  |
+
+- `(user_id, follower_id)` is the primary key of this table.
+- Each row in this table indicates that `follower_id` follows `user_id` on a social media platform.
+
+## Problem Statement
+
+Write a solution to calculate the number of followers for each user.
+
+- Return the result table ordered by `user_id` in ascending order.
+
+### Example 1:
+
+**Input:**  
+
+**Followers table:**  
+
+| user_id | follower_id |
+|---------|-------------|
+| 0       | 1           |
+| 1       | 0           |
+| 2       | 0           |
+| 2       | 1           |
+
+**Output:**  
+
+| user_id | followers_count |
+|---------|-----------------|
+| 0       | 1               |
+| 1       | 1               |
+| 2       | 2               |
+
+**Explanation:**  
+- User `0` has `1` follower (`1`).
+- User `1` has `1` follower (`0`).
+- User `2` has `2` followers (`0, 1`).
+
+## ANSWER
+```sql
+# Write your MySQL query statement below
+SELECT user_id, COUNT( follower_id) AS followers_count
+FROM Followers
+GROUP BY user_id
+ORDER BY user_id
+```
+-------------------------------
+## [619 - Biggest Single Number](https://leetcode.com/problems/biggest-single-number)
+
+## Table: MyNumbers
+
+| Column Name | Type |
+|-------------|------|
+| num         | int  |
+
+- This table may contain duplicates, meaning there is no primary key.
+- Each row contains an integer.
+
+## Problem Statement
+
+A **single number** is defined as a number that appears **only once** in the `MyNumbers` table.
+
+Write a solution to find the largest single number in the table. If there is no single number, return `null`.
+
+### Example 1:
+
+**Input:**  
+
+**MyNumbers table:**  
+
+| num |
+|-----|
+| 8   |
+| 8   |
+| 3   |
+| 3   |
+| 1   |
+| 4   |
+| 5   |
+| 6   |
+
+**Output:**  
+
+| num |
+|-----|
+| 6   |
+
+**Explanation:**  
+The single numbers are `1`, `4`, `5`, and `6`.  
+Since `6` is the largest single number, it is returned.
+
+---
+
+### Example 2:
+
+**Input:**  
+
+**MyNumbers table:**  
+
+| num |
+|-----|
+| 8   |
+| 8   |
+| 7   |
+| 7   |
+| 3   |
+| 3   |
+| 3   |
+
+**Output:**  
+
+| num  |
+|------|
+| null |
+
+**Explanation:**  
+There are no single numbers in the input table, so `null` is returned.
+
+## ANSWER
+```sql
+SELECT COALESCE(
+  (SELECT num
+  FROM MyNumbers
+  GROUP BY num
+  HAVING COUNT(num) = 1
+  ORDER BY num DESC
+  LIMIT 1), null) 
+  AS num
+```
+------------------------------------------
+## [1045 - Customers Who Bought All Products](https://leetcode.com/problems/customers-who-bought-all-products)
+
+## Table: Customer
+
+| Column Name | Type    |
+|-------------|---------|
+| customer_id | int     |
+| product_key | int     |
+
+This table may contain duplicate rows.  
+`customer_id` is not NULL.  
+`product_key` is a foreign key (reference column) to the `Product` table.
+
+---
+
+## Table: Product
+
+| Column Name | Type    |
+|-------------|---------|
+| product_key | int     |
+
+`product_key` is the primary key for this table.
+
+---
+
+## Problem Statement
+
+Write a solution to report the `customer_id` values from the `Customer` table that bought **all** the products in the `Product` table.
+
+Return the result table in any order.
+
+---
+
+### Example 1:
+
+**Input:**  
+**Customer Table:**
+
+| customer_id | product_key |
+|-------------|-------------|
+| 1           | 5           |
+| 2           | 6           |
+| 3           | 5           |
+| 3           | 6           |
+| 1           | 6           |
+
+**Product Table:**
+
+| product_key |
+|-------------|
+| 5           |
+| 6           |
+
+---
+
+**Output:**  
+
+| customer_id |
+|-------------|
+| 1           |
+| 3           |
+
+---
+
+**Explanation:**  
+The customers who bought all the products (5 and 6) are customers with IDs 1 and 3.  
+
+---
+
+## ANSWER  
+```sql
+select customer_id 
+from Customer  
+GROUP BY customer_id
+HAVING COUNT(DISTINCT product_key) = (
+  SELECT COUNT(product_key)
+  FROM Product
+)
+```
+----------------------
