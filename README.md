@@ -1895,8 +1895,6 @@ Write a solution to find the largest single number in the table. If there is no 
 The single numbers are `1`, `4`, `5`, and `6`.  
 Since `6` is the largest single number, it is returned.
 
----
-
 ### Example 2:
 
 **Input:**  
@@ -1947,8 +1945,6 @@ This table may contain duplicate rows.
 `customer_id` is not NULL.  
 `product_key` is a foreign key (reference column) to the `Product` table.
 
----
-
 ## Table: Product
 
 | Column Name | Type    |
@@ -1957,15 +1953,11 @@ This table may contain duplicate rows.
 
 `product_key` is the primary key for this table.
 
----
-
 ## Problem Statement
 
 Write a solution to report the `customer_id` values from the `Customer` table that bought **all** the products in the `Product` table.
 
 Return the result table in any order.
-
----
 
 ### Example 1:
 
@@ -1987,8 +1979,6 @@ Return the result table in any order.
 | 5           |
 | 6           |
 
----
-
 **Output:**  
 
 | customer_id |
@@ -1996,12 +1986,10 @@ Return the result table in any order.
 | 1           |
 | 3           |
 
----
 
 **Explanation:**  
 The customers who bought all the products (5 and 6) are customers with IDs 1 and 3.  
 
----
 
 ## ANSWER  
 ```sql
@@ -2030,8 +2018,6 @@ HAVING COUNT(DISTINCT product_key) = (
 - This table contains information about the employees and the ID of the manager they report to.  
 - Some employees do not report to anyone (`reports_to` is null).
 
----
-
 ## Problem Statement
 
 We will consider a manager as an employee who has at least one other employee reporting to them.
@@ -2042,8 +2028,6 @@ Write a solution to report the:
 - The average age of their reports (`average_age`, rounded to the nearest integer).
 
 Return the result table ordered by `employee_id`.
-
----
 
 ### Example 1:
 
@@ -2066,8 +2050,6 @@ Return the result table ordered by `employee_id`.
 **Explanation:**  
 - Hercy has 2 employees reporting to him: Alice and Bob.  
 - Their average age is `(41 + 36) / 2 = 38.5`, which is rounded to `39`.
-
----
 
 ### Example 2:
 
@@ -2098,7 +2080,6 @@ Return the result table ordered by `employee_id`.
 - Alice has 2 employees reporting to her: Charlie and David. Average age: `(34 + 40) / 2 = 37`.  
 - Bob has 1 employee reporting to him: Eve. Average age: `37`.
 
----
 
 ## ANSWER  
 
@@ -2128,8 +2109,6 @@ ORDER BY e1.employee_id
   - `'Y'`: The department is the primary department for the employee.  
   - `'N'`: The department is not the primary.  
 
----
-
 ## Problem Statement
 
 Employees can belong to multiple departments. When they join other departments, they decide on a primary department.  
@@ -2138,7 +2117,6 @@ Employees can belong to multiple departments. When they join other departments, 
 Write a solution to report all employees with their primary department.  
 - For employees with only one department, report their only department.
 
----
 
 ### Example 1:
 
@@ -2170,7 +2148,6 @@ Write a solution to report all employees with their primary department.
 - Employee 3 belongs to only one department (3), so it is their primary department.  
 - Employee 4 has department 3 as their primary department.
 
----
 
 ## ANSWER  
 
@@ -2198,8 +2175,6 @@ HAVING COUNT(employee_id)=1
 - `(x, y, z)` is the primary key column for this table.  
 - Each row represents the lengths of three line segments.
 
----
-
 ## Problem Statement
 
 Determine if the three line segments `(x, y, z)` can form a triangle.  
@@ -2209,8 +2184,6 @@ For three segments to form a triangle, they must satisfy the triangle inequality
 3. \( y + z > x \)  
 
 Write a query to return the result for each row with an additional column **triangle**, which should contain `'Yes'` if the segments can form a triangle and `'No'` otherwise.
-
----
 
 ### Example 1:
 
@@ -2315,14 +2288,12 @@ WHERE num = next AND num = prev
 - `(product_id, change_date)` is the **primary key** for this table.  
 - Each row indicates that the price of a product was changed to a new value on a specific date.  
 
----
 
 ## Problem Statement
 
 Find the prices of all products on **2019-08-16**.  
 - Assume that the price of all products is **10** before any changes are recorded.
 
----
 
 ### Example 1:
 
@@ -2392,7 +2363,6 @@ WHERE product_id NOT IN
 - `(person_id, turn)` contains all numbers from 1 to `n`, where `n` is the number of rows.  
 - `turn` determines the order in which people board the bus.  
 
----
 
 ## Problem Statement
 
@@ -2400,7 +2370,6 @@ Given a **weight limit of 1000 kg**, find the **person_name** of the **last pers
 - The test cases guarantee that the first person in line does not exceed the weight limit.  
 - Only one person can board the bus at a time, and the boarding happens in the order of `turn`.
 
----
 
 ### Example 1:
 
@@ -2436,8 +2405,6 @@ The table below tracks the cumulative weight:
 | 6    | 1  | Winston   | 500    | ___          | -                   |
 
 Thus, **John Cena** is the last person to board without exceeding the weight limit.
-
----
 
 ## ANSWER  
 
@@ -2604,7 +2571,7 @@ ORDER BY
 
 ```
 
----
+------------------------
 ## [626 - Exchange Seats](https://leetcode.com/problems/exchange-seats)
 
 ## Table: Seat
@@ -2664,7 +2631,7 @@ ORDER BY id;
 
 ```
 
----
+---------------------------
 ## [1341 - Movie Rating](https://leetcode.com/problems/movie-rating)
 
 ## Table: Movies
@@ -2795,7 +2762,7 @@ FROM TopMovie;
 
 ```
 
----
+-----------------------------------
 
 ## [1321 - Restaurant Growth](https://leetcode.com/problems/restaurant-growth)
 
@@ -2881,8 +2848,7 @@ WHERE visited_on >= (
 GROUP BY visited_on;
 ```
 
----
-
+-------------------------
 
 ## [602 - Friend Requests II: Who Has the Most Friends](https://leetcode.com/problems/friend-requests-ii-who-has-the-most-friends)
 
@@ -2950,7 +2916,7 @@ ORDER BY num DESC
 LIMIT 1
 ```
 
----
+---------------------------------
 
 ## [585 - Investments in 2016](https://leetcode.com/problems/investments-in-2016)
 
@@ -3028,10 +2994,7 @@ JOIN UniqueLocation u ON i.lat = u.lat AND i.lon = u.lon;
 
 ```
 
----
-Here’s the SQL question formatted as per your request:
-
----
+-------------------------------
 
 ## [185 - Department Top Three Salaries](https://leetcode.com/problems/department-top-three-salaries)
 
@@ -3136,7 +3099,7 @@ WHERE `rank` < 4;
 
 ```
 
----
+------------------------------------
 # Advanced String Functions / Regex / Clause
 
 
@@ -3189,10 +3152,7 @@ ORDER BY user_id;
 
 ```
 
----
-Here’s the SQL question formatted as per your request:
-
----
+----------------------------------
 
 ## [1527 - Patients With a Condition](https://leetcode.com/problems/patients-with-a-condition)
 
@@ -3242,11 +3202,7 @@ Bob and George both have a condition that starts with DIAB1.
 select patient_id,patient_name,conditions from Patients
 where conditions like 'DIAB1%'  or  conditions like '% DIAB1%' ;
 ```
-
----
-Here’s the SQL question formatted as per your request:
-
----
+--------------------------------------------------------------------------
 
 ## [196 - Delete Duplicate Emails](https://leetcode.com/problems/delete-duplicate-emails)
 
@@ -3297,10 +3253,7 @@ delete p1 from person p1,person p2
 where p1.email=p2.email and p1.id>p2.id;
 ```
 
----
-Here’s the SQL question formatted as per your request:
-
----
+----------------------------------------------------------------------
 
 ## [176 - Second Highest Salary](https://leetcode.com/problems/second-highest-salary)
 
@@ -3358,10 +3311,7 @@ FROM Employee
 WHERE salary < (SELECT MAX(salary) FROM Employee);
 ```
 
----
-Here is the SQL question converted into the desired format:
-
----
+-------------------------------------------------------------------------------
 
 ## [1484 - Group Sold Products By The Date](https://leetcode.com/problems/group-sold-products-by-the-date)
 
@@ -3420,11 +3370,8 @@ select sell_date, count( DISTINCT product ) as num_sold ,
         FROM Activities GROUP BY sell_date order by sell_date ASC;
 ```
 
----
+-------------------------------------------------------------------------------------------
 
-Here is the SQL question converted into the desired format:
-
----
 
 ## [1327 - List the Products Ordered in a Period](https://leetcode.com/problems/list-the-products-ordered-in-a-period)
 
@@ -3509,10 +3456,7 @@ GROUP BY p.product_id
 HAVING SUM(o.unit)>=100
 ```
 
----
-Here is the SQL question converted into the desired format:
-
----
+--------------------------------------------------------------------------------------
 
 ## [1517 - Find Users With Valid E-Mails](https://leetcode.com/problems/find-users-with-valid-e-mails)
 
