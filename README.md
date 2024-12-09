@@ -2884,3 +2884,257 @@ GROUP BY visited_on;
 ---
 
 
+## [602 - Friend Requests II: Who Has the Most Friends](https://leetcode.com/problems/friend-requests-ii-who-has-the-most-friends)
+
+## Table: RequestAccepted
+
+| Column Name    | Type    |
+|----------------|---------|
+| requester_id   | int     |
+| accepter_id    | int     |
+| accept_date    | date    |
+
+(requester_id, accepter_id) is the primary key (combination of columns with unique values) for this table.  
+This table contains the ID of the user who sent the request, the ID of the user who received the request, and the date when the request was accepted.
+
+## Problem Statement
+
+Write a solution to find the people who have the most friends and the most friends number.
+
+The test cases are generated so that only one person has the most friends.
+
+Return the result in the following format:
+
+### Example 1:
+
+**Input:**  
+RequestAccepted table:
+
+| requester_id | accepter_id | accept_date |
+|--------------|-------------|-------------|
+| 1            | 2           | 2016/06/03  |
+| 1            | 3           | 2016/06/08  |
+| 2            | 3           | 2016/06/08  |
+| 3            | 4           | 2016/06/09  |
+
+**Output:**  
+
+| id | num |
+|----|-----|
+| 3  | 3   |
+
+**Explanation:**  
+The person with id 3 is a friend of people 1, 2, and 4, so they have three friends in total, which is the most number compared to anyone else.
+
+## Follow-up:  
+In the real world, multiple people could have the same most number of friends. Could you find all these people in this case?
+
+## ANSWER
+```sql
+WITH all_ids AS (
+    SELECT ra.requester_id AS id, COUNT(*) AS cnt
+    FROM RequestAccepted ra
+    GROUP BY ra.requester_id
+
+    UNION ALL -- don't remove duplicates
+
+    SELECT ra.accepter_id AS id, COUNT(*) AS cnt 
+    FROM RequestAccepted ra
+    GROUP BY ra.accepter_id
+)
+
+SELECT id, SUM(cnt) AS num
+FROM all_ids
+GROUP BY id
+ORDER BY num DESC
+LIMIT 1
+```
+
+---
+
+## [585 - Investments in 2016](https://leetcode.com/problems/investments-in-2016)
+
+## Table: Insurance
+
+| Column Name | Type   |
+|-------------|--------|
+| pid         | int    |
+| tiv_2015    | float  |
+| tiv_2016    | float  |
+| lat         | float  |
+| lon         | float  |
+
+pid is the primary key (column with unique values) for this table.  
+Each row of this table contains information about one policy where:
+- pid is the policyholder's policy ID.
+- tiv_2015 is the total investment value in 2015, and tiv_2016 is the total investment value in 2016.
+- lat is the latitude of the policyholder's city, and lon is the longitude. It's guaranteed that lat and lon are not NULL.
+
+## Problem Statement
+
+Write a solution to report the sum of all total investment values in 2016 (tiv_2016), for all policyholders who:
+1. Have the same tiv_2015 value as one or more other policyholders.
+2. Are not located in the same city as any other policyholder (i.e., the `(lat, lon)` attribute pairs must be unique).
+
+Round tiv_2016 to two decimal places.
+
+### Example 1:
+
+**Input:**  
+Insurance table:
+
+| pid | tiv_2015 | tiv_2016 | lat | lon |
+|-----|----------|----------|-----|-----|
+| 1   | 10       | 5        | 10  | 10  |
+| 2   | 20       | 20       | 20  | 20  |
+| 3   | 10       | 30       | 20  | 20  |
+| 4   | 10       | 40       | 40  | 40  |
+
+**Output:**  
+
+| tiv_2016 |
+|----------|
+| 45.00    |
+
+**Explanation:**  
+The first record in the table, like the last record, meets both of the two criteria:
+1. The tiv_2015 value of 10 is the same as the third and fourth records.
+2. Its location is unique.
+
+The second record does not meet either of the two criteria. Its tiv_2015 is not like any other policyholder, and its location is the same as the third record, which makes the third record fail as well.
+
+Thus, the result is the sum of tiv_2016 of the first and last record, which is 45.
+
+## ANSWER
+```sql
+WITH DuplicateTIV AS (
+    -- Identify the tiv_2015 values that are duplicated
+    SELECT tiv_2015
+    FROM Insurance
+    GROUP BY tiv_2015
+    HAVING COUNT(*) > 1
+),
+UniqueLocation AS (
+    -- Identify the (lat, lon) pairs that are unique
+    SELECT lat, lon
+    FROM Insurance
+    GROUP BY lat, lon
+    HAVING COUNT(*) = 1
+)
+SELECT ROUND(SUM(i.tiv_2016), 2) AS tiv_2016
+FROM Insurance i
+JOIN DuplicateTIV d ON i.tiv_2015 = d.tiv_2015
+JOIN UniqueLocation u ON i.lat = u.lat AND i.lon = u.lon;
+
+```
+
+---
+Here’s the SQL question formatted as per your request:
+
+---
+
+## [185 - Department Top Three Salaries](https://leetcode.com/problems/department-top-three-salaries)
+
+## Table: Employee
+
+| Column Name  | Type    |
+|--------------|---------|
+| id           | int     |
+| name         | varchar |
+| salary       | int     |
+| departmentId | int     |
+
+id is the primary key (column with unique values) for this table.  
+departmentId is a foreign key (reference column) of the ID from the Department table.  
+Each row of this table indicates the ID, name, and salary of an employee. It also contains the ID of their department.
+
+## Table: Department
+
+| Column Name | Type    |
+|-------------|---------|
+| id          | int     |
+| name        | varchar |
+  
+id is the primary key (column with unique values) for this table.  
+Each row of this table indicates the ID of a department and its name.
+
+## Problem Statement
+
+A company's executives are interested in seeing who earns the most money in each of the company's departments. A high earner in a department is an employee who has a salary in the top three unique salaries for that department.
+
+Write a solution to find the employees who are high earners in each of the departments.
+
+Return the result table in any order.
+
+### Example 1:
+
+**Input:**  
+Employee table:
+
+| id  | name  | salary | departmentId |
+|-----|-------|--------|--------------|
+| 1   | Joe   | 85000  | 1            |
+| 2   | Henry | 80000  | 2            |
+| 3   | Sam   | 60000  | 2            |
+| 4   | Max   | 90000  | 1            |
+| 5   | Janet | 69000  | 1            |
+| 6   | Randy | 85000  | 1            |
+| 7   | Will  | 70000  | 1            |
+
+Department table:
+
+| id  | name  |
+|-----|-------|
+| 1   | IT    |
+| 2   | Sales |
+
+**Output:**  
+
+| Department | Employee | Salary |
+|------------|----------|--------|
+| IT         | Max      | 90000  |
+| IT         | Joe      | 85000  |
+| IT         | Randy    | 85000  |
+| IT         | Will     | 70000  |
+| Sales      | Henry    | 80000  |
+| Sales      | Sam      | 60000  |
+
+**Explanation:**  
+In the IT department:
+- Max earns the highest unique salary
+- Both Randy and Joe earn the second-highest unique salary
+- Will earns the third-highest unique salary
+
+In the Sales department:
+- Henry earns the highest salary
+- Sam earns the second-highest salary
+- There is no third-highest salary as there are only two employees in this department.
+
+## ANSWER
+```sql
+WITH EmpsWithDeps AS (
+  SELECT 
+    Employee.id AS empId,
+    Department.id AS depId,
+    Employee.name AS empName,
+    Department.name AS depName,
+    Employee.salary AS salary,
+    dense_rank() OVER (
+      PARTITION BY Department.id 
+      ORDER BY Employee.salary DESC
+    ) AS `rank`
+  FROM Employee
+  JOIN Department ON Employee.departmentId = Department.id
+)
+
+SELECT 
+  depName AS Department,
+  empName AS Employee,
+  salary AS Salary
+FROM EmpsWithDeps 
+WHERE `rank` < 4;
+
+```
+
+---
+# Advanced String Functions / Regex / Clause
