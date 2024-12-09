@@ -2540,3 +2540,347 @@ GROUP BY AllCategories.category;
 ```
 --------------------------
 # Subqueries
+
+## [1978 - Employees Whose Manager Left the Company](https://leetcode.com/problems/employees-whose-manager-left-the-company)
+
+## Table: Employees
+
+| Column Name | Type     |
+|-------------|----------|
+| employee_id | int      |
+| name        | varchar  |
+| manager_id  | int      |
+| salary      | int      |
+
+`employee_id` is the primary key for this table.  
+This table contains information about the employees, their salary, and the ID of their manager. Some employees do not have a manager (`manager_id` is null). 
+
+## Problem Statement
+
+Find the IDs of the employees whose salary is strictly less than $30,000 and whose manager left the company. When a manager leaves the company, their information is deleted from the `Employees` table, but the reports still have their `manager_id` set to the manager that left.
+
+Return the result table ordered by `employee_id`.
+
+### Example 1:
+
+**Input:**  
+Employees table:
+
+| employee_id | name      | manager_id | salary |
+|-------------|-----------|------------|--------|
+| 3           | Mila      | 9          | 60301  |
+| 12          | Antonella | null       | 31000  |
+| 13          | Emery     | null       | 67084  |
+| 1           | Kalel     | 11         | 21241  |
+| 9           | Mikaela   | null       | 50937  |
+| 11          | Joziah    | 6          | 28485  |
+
+**Output:**  
+
+| employee_id |
+|-------------|
+| 11          |
+
+**Explanation:**  
+The employees with a salary less than $30,000 are 1 (Kalel) and 11 (Joziah).  
+Kalel's manager is employee 11, who is still in the company (Joziah).  
+Joziah's manager is employee 6, who left the company because there is no row for employee 6 (as it was deleted).
+
+## ANSWER  
+```sql
+SELECT 
+    e.employee_id
+FROM 
+    Employees e
+WHERE 
+    e.salary < 30000 
+    AND e.manager_id IS NOT NULL
+    AND e.manager_id NOT IN (
+        SELECT employee_id
+        FROM Employees
+    )
+ORDER BY 
+    e.employee_id;
+
+```
+
+---
+## [626 - Exchange Seats](https://leetcode.com/problems/exchange-seats)
+
+## Table: Seat
+
+| Column Name | Type    |
+|-------------|---------|
+| id          | int     |
+| student     | varchar |
+
+`id` is the primary key (unique value) column for this table.  
+Each row of this table indicates the name and the ID of a student.  
+The ID sequence always starts from 1 and increments continuously.
+
+## Problem Statement
+
+Write a solution to swap the seat id of every two consecutive students. If the number of students is odd, the id of the last student is not swapped.
+
+Return the result table ordered by `id` in ascending order.
+
+### Example 1:
+
+**Input:**  
+Seat table:
+
+| id | student |
+|----|---------|
+| 1  | Abbot   |
+| 2  | Doris   |
+| 3  | Emerson |
+| 4  | Green   |
+| 5  | Jeames  |
+
+**Output:**  
+
+| id | student |
+|----|---------|
+| 1  | Doris   |
+| 2  | Abbot   |
+| 3  | Green   |
+| 4  | Emerson |
+| 5  | Jeames  |
+
+**Explanation:**  
+Note that if the number of students is odd, there is no need to change the last one's seat.
+
+## ANSWER  
+```sql
+SELECT 
+    CASE 
+        WHEN MOD(id, 2) = 1 AND id + 1 <= (SELECT MAX(id) FROM Seat) THEN id + 1
+        WHEN MOD(id, 2) = 0 THEN id - 1
+        ELSE id
+    END AS id,
+    student
+FROM Seat
+ORDER BY id;
+
+```
+
+---
+## [1341 - Movie Rating](https://leetcode.com/problems/movie-rating)
+
+## Table: Movies
+
+| Column Name   | Type    |
+|---------------|---------|
+| movie_id      | int     |
+| title         | varchar |
+
+`movie_id` is the primary key (column with unique values) for this table.  
+`title` is the name of the movie.
+
+## Table: Users
+
+| Column Name   | Type    |
+|---------------|---------|
+| user_id       | int     |
+| name          | varchar |
+
+`user_id` is the primary key (column with unique values) for this table.  
+The column `name` has unique values.
+
+## Table: MovieRating
+
+| Column Name   | Type    |
+|---------------|---------|
+| movie_id      | int     |
+| user_id       | int     |
+| rating        | int     |
+| created_at    | date    |
+
+`(movie_id, user_id)` is the primary key (column with unique values) for this table.  
+This table contains the rating of a movie by a user in their review.  
+`created_at` is the user's review date.
+
+## Problem Statement
+
+Write a solution to:
+
+1. Find the name of the user who has rated the greatest number of movies. In case of a tie, return the lexicographically smaller user name.
+2. Find the movie name with the highest average rating in February 2020. In case of a tie, return the lexicographically smaller movie name.
+
+### Example 1:
+
+**Input:**  
+Movies table:
+
+| movie_id | title     |
+|----------|-----------|
+| 1        | Avengers  |
+| 2        | Frozen 2  |
+| 3        | Joker     |
+
+Users table:
+
+| user_id | name    |
+|---------|---------|
+| 1       | Daniel  |
+| 2       | Monica  |
+| 3       | Maria   |
+| 4       | James   |
+
+MovieRating table:
+
+| movie_id | user_id | rating | created_at |
+|----------|---------|--------|------------|
+| 1        | 1       | 3      | 2020-01-12 |
+| 1        | 2       | 4      | 2020-02-11 |
+| 1        | 3       | 2      | 2020-02-12 |
+| 1        | 4       | 1      | 2020-01-01 |
+| 2        | 1       | 5      | 2020-02-17 |
+| 2        | 2       | 2      | 2020-02-01 |
+| 2        | 3       | 2      | 2020-03-01 |
+| 3        | 1       | 3      | 2020-02-22 |
+| 3        | 2       | 4      | 2020-02-25 |
+
+**Output:**
+
+| results   |
+|-----------|
+| Daniel    |
+| Frozen 2  |
+
+**Explanation:**  
+- Daniel and Monica have rated 3 movies ("Avengers", "Frozen 2", and "Joker"), but Daniel is lexicographically smaller.
+- Frozen 2 and Joker have an average rating of 3.5 in February, but Frozen 2 is lexicographically smaller.
+
+## ANSWER  
+```sql
+WITH UserRatingCount AS (
+    SELECT 
+        u.name AS user_name,
+        COUNT(mr.movie_id) AS rating_count
+    FROM Users u
+    JOIN MovieRating mr ON u.user_id = mr.user_id
+    GROUP BY u.name
+),
+TopUser AS (
+    SELECT 
+        user_name
+    FROM UserRatingCount
+    ORDER BY rating_count DESC, user_name ASC
+    LIMIT 1
+),
+MovieAverageRating AS (
+    SELECT 
+        m.title AS movie_title,
+        AVG(mr.rating) AS avg_rating
+    FROM Movies m
+    JOIN MovieRating mr ON m.movie_id = mr.movie_id
+    WHERE mr.created_at BETWEEN '2020-02-01' AND '2020-02-29'
+    GROUP BY m.title
+),
+TopMovie AS (
+    SELECT 
+        movie_title
+    FROM MovieAverageRating
+    ORDER BY avg_rating DESC, movie_title ASC
+    LIMIT 1
+)
+SELECT 
+    user_name AS results
+FROM TopUser
+UNION ALL
+SELECT 
+    movie_title AS results
+FROM TopMovie;
+
+```
+
+---
+
+## [1321 - Restaurant Growth](https://leetcode.com/problems/restaurant-growth)
+
+## Table: Customer
+
+| Column Name   | Type    |
+|---------------|---------|
+| customer_id   | int     |
+| name          | varchar |
+| visited_on    | date    |
+| amount        | int     |
+
+`(customer_id, visited_on)` is the primary key for this table.  
+This table contains data about customer transactions in a restaurant.  
+`visited_on` is the date on which the customer with ID (`customer_id`) has visited the restaurant.  
+`amount` is the total paid by a customer.
+
+## Problem Statement
+
+You are the restaurant owner and you want to analyze a possible expansion (there will be at least one customer every day).
+
+Compute the moving average of how much the customer paid in a seven days window (i.e., current day + 6 days before).  
+`average_amount` should be rounded to two decimal places.
+
+Return the result table ordered by `visited_on` in ascending order.
+
+### Example 1:
+
+**Input:**  
+Customer table:
+
+| customer_id | name    | visited_on  | amount |
+|-------------|---------|-------------|--------|
+| 1           | Jhon    | 2019-01-01  | 100    |
+| 2           | Daniel  | 2019-01-02  | 110    |
+| 3           | Jade    | 2019-01-03  | 120    |
+| 4           | Khaled  | 2019-01-04  | 130    |
+| 5           | Winston | 2019-01-05  | 110    |
+| 6           | Elvis   | 2019-01-06  | 140    |
+| 7           | Anna    | 2019-01-07  | 150    |
+| 8           | Maria   | 2019-01-08  | 80     |
+| 9           | Jaze    | 2019-01-09  | 110    |
+| 1           | Jhon    | 2019-01-10  | 130    |
+| 3           | Jade    | 2019-01-10  | 150    |
+
+**Output:**  
+
+| visited_on | amount | average_amount |
+|------------|--------|----------------|
+| 2019-01-07 | 860    | 122.86         |
+| 2019-01-08 | 840    | 120            |
+| 2019-01-09 | 840    | 120            |
+| 2019-01-10 | 1000   | 142.86         |
+
+**Explanation:**  
+1. 1st moving average from 2019-01-01 to 2019-01-07 has an `average_amount` of (100 + 110 + 120 + 130 + 110 + 140 + 150) / 7 = 122.86  
+2. 2nd moving average from 2019-01-02 to 2019-01-08 has an `average_amount` of (110 + 120 + 130 + 110 + 140 + 150 + 80) / 7 = 120  
+3. 3rd moving average from 2019-01-03 to 2019-01-09 has an `average_amount` of (120 + 130 + 110 + 140 + 150 + 80 + 110) / 7 = 120  
+4. 4th moving average from 2019-01-04 to 2019-01-10 has an `average_amount` of (130 + 110 + 140 + 150 + 80 + 110 + 130 + 150) / 7 = 142.86
+
+## ANSWER  
+```sql
+SELECT
+    visited_on,
+    (
+        SELECT SUM(amount)
+        FROM customer
+        WHERE visited_on BETWEEN DATE_SUB(c.visited_on, INTERVAL 6 DAY) AND c.visited_on
+    ) AS amount,
+    ROUND(
+        (
+            SELECT SUM(amount) / 7
+            FROM customer
+            WHERE visited_on BETWEEN DATE_SUB(c.visited_on, INTERVAL 6 DAY) AND c.visited_on
+        ),
+        2
+    ) AS average_amount
+FROM customer c
+WHERE visited_on >= (
+        SELECT DATE_ADD(MIN(visited_on), INTERVAL 6 DAY)
+        FROM customer
+    )
+GROUP BY visited_on;
+```
+
+---
+
+
