@@ -2015,3 +2015,294 @@ HAVING COUNT(DISTINCT product_key) = (
 ```
 ----------------------
 # Advanced Select and Joins
+## [1731 - The Number of Employees Which Report to Each Employee](https://leetcode.com/problems/the-number-of-employees-which-report-to-each-employee)
+
+## Table: Employees
+
+| Column Name  | Type    |
+|--------------|---------|
+| employee_id  | int     |
+| name         | varchar |
+| reports_to   | int     |
+| age          | int     |
+
+- `employee_id` is the column with unique values for this table.  
+- This table contains information about the employees and the ID of the manager they report to.  
+- Some employees do not report to anyone (`reports_to` is null).
+
+---
+
+## Problem Statement
+
+We will consider a manager as an employee who has at least one other employee reporting to them.
+
+Write a solution to report the:
+- IDs (`employee_id`) and names of all managers,
+- The number of employees who report directly to them (`reports_count`),
+- The average age of their reports (`average_age`, rounded to the nearest integer).
+
+Return the result table ordered by `employee_id`.
+
+---
+
+### Example 1:
+
+**Input:**  
+**Employees Table:**  
+
+| employee_id | name    | reports_to | age |
+|-------------|---------|------------|-----|
+| 9           | Hercy   | null       | 43  |
+| 6           | Alice   | 9          | 41  |
+| 4           | Bob     | 9          | 36  |
+| 2           | Winston | null       | 37  |
+
+**Output:**  
+
+| employee_id | name  | reports_count | average_age |
+|-------------|-------|---------------|-------------|
+| 9           | Hercy | 2             | 39          |
+
+**Explanation:**  
+- Hercy has 2 employees reporting to him: Alice and Bob.  
+- Their average age is `(41 + 36) / 2 = 38.5`, which is rounded to `39`.
+
+---
+
+### Example 2:
+
+**Input:**  
+**Employees Table:**  
+
+| employee_id | name    | reports_to | age |
+|-------------|---------|------------|-----|
+| 1           | Michael | null       | 45  |
+| 2           | Alice   | 1          | 38  |
+| 3           | Bob     | 1          | 42  |
+| 4           | Charlie | 2          | 34  |
+| 5           | David   | 2          | 40  |
+| 6           | Eve     | 3          | 37  |
+| 7           | Frank   | null       | 50  |
+| 8           | Grace   | null       | 48  |
+
+**Output:**  
+
+| employee_id | name    | reports_count | average_age |
+|-------------|---------|---------------|-------------|
+| 1           | Michael | 2             | 40          |
+| 2           | Alice   | 2             | 37          |
+| 3           | Bob     | 1             | 37          |
+
+**Explanation:**  
+- Michael has 2 employees reporting to him: Alice and Bob. Average age: `(38 + 42) / 2 = 40`.  
+- Alice has 2 employees reporting to her: Charlie and David. Average age: `(34 + 40) / 2 = 37`.  
+- Bob has 1 employee reporting to him: Eve. Average age: `37`.
+
+---
+
+## ANSWER  
+
+```sql
+SELECT e1.employee_id, e1.name, COUNT(e2.employee_id) reports_count, ROUND(AVG(e2.age)) average_age 
+FROM Employees e1, Employees e2
+WHERE e1.employee_id = e2.reports_to
+GROUP BY e1.employee_id
+HAVING reports_count > 0
+ORDER BY e1.employee_id
+```
+----------------------------
+## [1789 - Primary Department for Each Employee](https://leetcode.com/problems/primary-department-for-each-employee)
+
+## Table: Employee
+
+| Column Name   | Type    |
+|---------------|---------|
+| employee_id   | int     |
+| department_id | int     |
+| primary_flag  | varchar |
+
+- `(employee_id, department_id)` is the primary key (combination of columns with unique values).  
+- `employee_id` is the ID of the employee.  
+- `department_id` is the ID of the department the employee belongs to.  
+- `primary_flag` is an ENUM of type ('Y', 'N'):  
+  - `'Y'`: The department is the primary department for the employee.  
+  - `'N'`: The department is not the primary.  
+
+---
+
+## Problem Statement
+
+Employees can belong to multiple departments. When they join other departments, they decide on a primary department.  
+- If an employee belongs to only one department, their `primary_flag` is `'N'`.
+
+Write a solution to report all employees with their primary department.  
+- For employees with only one department, report their only department.
+
+---
+
+### Example 1:
+
+**Input:**  
+**Employee Table:**  
+
+| employee_id | department_id | primary_flag |
+|-------------|---------------|--------------|
+| 1           | 1             | N            |
+| 2           | 1             | Y            |
+| 2           | 2             | N            |
+| 3           | 3             | N            |
+| 4           | 2             | N            |
+| 4           | 3             | Y            |
+| 4           | 4             | N            |
+
+**Output:**  
+
+| employee_id | department_id |
+|-------------|---------------|
+| 1           | 1             |
+| 2           | 1             |
+| 3           | 3             |
+| 4           | 3             |
+
+**Explanation:**  
+- Employee 1 belongs to one department (1), so it is their primary department.  
+- Employee 2 has department 1 as their primary department.  
+- Employee 3 belongs to only one department (3), so it is their primary department.  
+- Employee 4 has department 3 as their primary department.
+
+---
+
+## ANSWER  
+
+```sql
+SELECT employee_id, department_id
+FROM Employee 
+WHERE primary_flag = 'Y'
+UNION
+SELECT employee_id, department_id
+FROM Employee
+GROUP BY employee_id
+HAVING COUNT(employee_id)=1
+```
+-----------------------
+## [610 - Triangle Judgement](https://leetcode.com/problems/triangle-judgement)
+
+## Table: Triangle
+
+| Column Name | Type |
+|-------------|------|
+| x           | int  |
+| y           | int  |
+| z           | int  |
+
+- `(x, y, z)` is the primary key column for this table.  
+- Each row represents the lengths of three line segments.
+
+---
+
+## Problem Statement
+
+Determine if the three line segments `(x, y, z)` can form a triangle.  
+For three segments to form a triangle, they must satisfy the triangle inequality conditions:  
+1. \( x + y > z \)  
+2. \( x + z > y \)  
+3. \( y + z > x \)  
+
+Write a query to return the result for each row with an additional column **triangle**, which should contain `'Yes'` if the segments can form a triangle and `'No'` otherwise.
+
+---
+
+### Example 1:
+
+**Input:**  
+**Triangle Table:**  
+
+| x  | y  | z  |
+|----|----|----|
+| 13 | 15 | 30 |
+| 10 | 20 | 15 |
+
+**Output:**  
+
+| x  | y  | z  | triangle |
+|----|----|----|----------|
+| 13 | 15 | 30 | No       |
+| 10 | 20 | 15 | Yes      |
+
+**Explanation:**  
+- For the first row, \( 13 + 15 \leq 30 \), so it cannot form a triangle.  
+- For the second row, all the triangle inequality conditions are satisfied, so it can form a triangle.
+
+---
+
+## ANSWER  
+
+```sql
+SELECT x, y, z, 
+CASE WHEN x + y > z AND x + z > y AND y + z > x THEN 'Yes'
+ELSE 'No' END AS triangle
+FROM Triangle
+```
+----------------------------
+## [180 - Consecutive Numbers](https://leetcode.com/problems/consecutive-numbers)
+
+## Table: Logs
+
+| Column Name | Type    |
+|-------------|---------|
+| id          | int     |
+| num         | varchar |
+
+- `id` is the primary key column for this table.  
+- The `id` column is an autoincrement column starting from 1.  
+
+---
+
+## Problem Statement
+
+Find all numbers in the `Logs` table that appear at least **three times consecutively**.  
+Return the result as a table with one column: **ConsecutiveNums**.
+
+---
+
+### Example 1:
+
+**Input:**  
+**Logs Table:**  
+
+| id | num |
+|----|-----|
+| 1  | 1   |
+| 2  | 1   |
+| 3  | 1   |
+| 4  | 2   |
+| 5  | 1   |
+| 6  | 2   |
+| 7  | 2   |
+
+**Output:**  
+
+| ConsecutiveNums |
+|-----------------|
+| 1               |
+
+**Explanation:**  
+- The number `1` appears consecutively for at least 3 times (at `id = 1, 2, 3`).  
+- No other numbers satisfy this condition.
+
+---
+
+## ANSWER  
+
+```sql
+WITH cte AS (
+  SELECT id, num, 
+    LEAD(num) OVER (ORDER BY id) AS next, 
+    LAG(num) OVER (ORDER BY id) AS prev
+  FROM Logs
+) 
+SELECT DISTINCT(num) AS ConsecutiveNums
+FROM cte
+WHERE num = next AND num = prev
+```
+------------------
