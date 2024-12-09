@@ -2233,7 +2233,6 @@ Write a query to return the result for each row with an additional column **tria
 - For the first row, \( 13 + 15 \leq 30 \), so it cannot form a triangle.  
 - For the second row, all the triangle inequality conditions are satisfied, so it can form a triangle.
 
----
 
 ## ANSWER  
 
@@ -2256,14 +2255,12 @@ FROM Triangle
 - `id` is the primary key column for this table.  
 - The `id` column is an autoincrement column starting from 1.  
 
----
 
 ## Problem Statement
 
 Find all numbers in the `Logs` table that appear at least **three times consecutively**.  
 Return the result as a table with one column: **ConsecutiveNums**.
 
----
 
 ### Example 1:
 
@@ -2290,7 +2287,6 @@ Return the result as a table with one column: **ConsecutiveNums**.
 - The number `1` appears consecutively for at least 3 times (at `id = 1, 2, 3`).  
 - No other numbers satisfy this condition.
 
----
 
 ## ANSWER  
 
@@ -2306,3 +2302,241 @@ FROM cte
 WHERE num = next AND num = prev
 ```
 ------------------
+## [1164 - Product Price at a Given Date](https://leetcode.com/problems/product-price-at-a-given-date)
+
+## Table: Products
+
+| Column Name   | Type    |
+|---------------|---------|
+| product_id    | int     |
+| new_price     | int     |
+| change_date   | date    |
+
+- `(product_id, change_date)` is the **primary key** for this table.  
+- Each row indicates that the price of a product was changed to a new value on a specific date.  
+
+---
+
+## Problem Statement
+
+Find the prices of all products on **2019-08-16**.  
+- Assume that the price of all products is **10** before any changes are recorded.
+
+---
+
+### Example 1:
+
+**Input:**  
+**Products Table:**  
+
+| product_id | new_price | change_date |
+|------------|-----------|-------------|
+| 1          | 20        | 2019-08-14  |
+| 2          | 50        | 2019-08-14  |
+| 1          | 30        | 2019-08-15  |
+| 1          | 35        | 2019-08-16  |
+| 2          | 65        | 2019-08-17  |
+| 3          | 20        | 2019-08-18  |
+
+**Output:**  
+
+| product_id | price |
+|------------|-------|
+| 2          | 50    |
+| 1          | 35    |
+| 3          | 10    |
+
+**Explanation:**  
+- For **product_id = 1**, the price on **2019-08-16** is 35.  
+- For **product_id = 2**, the price on **2019-08-16** is 50.  
+- For **product_id = 3**, there is no change recorded before **2019-08-16**, so the price is 10 (default value).
+
+
+## ANSWER  
+
+```sql
+SELECT product_id, new_price AS price
+FROM products
+WHERE (product_id, change_date) IN
+(   
+    SELECT product_id, MAX(change_date)
+    FROM products
+    WHERE change_date <= '2019-08-16'
+    GROUP BY product_id
+)
+UNION
+
+SELECT product_id, 10 AS price
+FROM products
+WHERE product_id NOT IN
+(
+    SELECT product_id
+    FROM products
+    WHERE change_date <= '2019-08-16'
+);
+
+```
+-----------------
+## [1204 - Last Person to Fit in the Bus](https://leetcode.com/problems/last-person-to-fit-in-the-bus)
+
+## Table: Queue
+
+| Column Name | Type    |
+|-------------|---------|
+| person_id   | int     |
+| person_name | varchar |
+| weight      | int     |
+| turn        | int     |
+
+- `person_id` contains **unique values**.  
+- `(person_id, turn)` contains all numbers from 1 to `n`, where `n` is the number of rows.  
+- `turn` determines the order in which people board the bus.  
+
+---
+
+## Problem Statement
+
+Given a **weight limit of 1000 kg**, find the **person_name** of the **last person** who can board the bus without exceeding the limit.  
+- The test cases guarantee that the first person in line does not exceed the weight limit.  
+- Only one person can board the bus at a time, and the boarding happens in the order of `turn`.
+
+---
+
+### Example 1:
+
+**Input:**  
+**Queue Table:**  
+
+| person_id | person_name | weight | turn |
+|-----------|-------------|--------|------|
+| 5         | Alice       | 250    | 1    |
+| 4         | Bob         | 175    | 5    |
+| 3         | Alex        | 350    | 2    |
+| 6         | John Cena   | 400    | 3    |
+| 1         | Winston     | 500    | 6    |
+| 2         | Marie       | 200    | 4    |
+
+**Output:**  
+
+| person_name |
+|-------------|
+| John Cena   |
+
+**Explanation:**  
+
+The table below tracks the cumulative weight:  
+
+| Turn | ID | Name      | Weight | Total Weight | Notes               |
+|------|----|-----------|--------|--------------|---------------------|
+| 1    | 5  | Alice     | 250    | 250          | Alice boards.       |
+| 2    | 3  | Alex      | 350    | 600          | Alex boards.        |
+| 3    | 6  | John Cena | 400    | 1000         | John Cena boards.   |
+| 4    | 2  | Marie     | 200    | 1200         | Marie **cannot** board. |
+| 5    | 4  | Bob       | 175    | ___          | -                   |
+| 6    | 1  | Winston   | 500    | ___          | -                   |
+
+Thus, **John Cena** is the last person to board without exceeding the weight limit.
+
+---
+
+## ANSWER  
+
+```sql
+WITH CumulativeWeight AS (
+    SELECT 
+        person_name,
+        weight,
+        turn,
+        SUM(weight) OVER (ORDER BY turn) AS total_weight
+    FROM 
+        Queue
+)
+SELECT 
+    person_name
+FROM 
+    CumulativeWeight
+WHERE 
+    total_weight <= 1000
+ORDER BY 
+    turn DESC
+LIMIT 1;
+```
+----------------------
+## [1907 - Count Salary Categories](https://leetcode.com/problems/count-salary-categories)
+
+## Table: Accounts
+
+| Column Name | Type |
+|-------------|------|
+| account_id  | int  |
+| income      | int  |
+
+`account_id` is the primary key (column with unique values) for this table.  
+Each row contains information about the monthly income for one bank account.
+
+## Problem Statement
+
+Write a solution to calculate the number of bank accounts for each salary category. The salary categories are:
+
+- "Low Salary": All the salaries strictly less than $20,000.
+- "Average Salary": All the salaries in the inclusive range [$20,000, $50,000].
+- "High Salary": All the salaries strictly greater than $50,000.
+
+The result table must contain all three categories. If there are no accounts in a category, return 0.
+
+Return the result table in any order.
+
+### Example 1:
+
+**Input:**  
+Accounts table:  
+
+| account_id | income  |
+|------------|---------|
+| 3          | 108939  |
+| 2          | 12747   |
+| 8          | 87709   |
+| 6          | 91796   |
+
+**Output:**  
+
+| category        | accounts_count |
+|-----------------|----------------|
+| Low Salary      | 1              |
+| Average Salary  | 0              |
+| High Salary     | 3              |
+
+**Explanation:**  
+- **Low Salary**: Account 2 with income 12747.  
+- **Average Salary**: No accounts fall in this range.  
+- **High Salary**: Accounts 3, 6, and 8 have incomes greater than 50000.  
+
+## ANSWER  
+```sql
+WITH CategorizedAccounts AS (
+    SELECT 
+        CASE 
+            WHEN income < 20000 THEN 'Low Salary'
+            WHEN income BETWEEN 20000 AND 50000 THEN 'Average Salary'
+            ELSE 'High Salary'
+        END AS category
+    FROM 
+        Accounts
+)
+SELECT 
+    AllCategories.category AS category,  -- Explicitly specify the source
+    COUNT(CategorizedAccounts.category) AS accounts_count
+FROM (
+    SELECT 'Low Salary' AS category
+    UNION ALL
+    SELECT 'Average Salary'
+    UNION ALL
+    SELECT 'High Salary'
+) AS AllCategories
+LEFT JOIN CategorizedAccounts
+ON AllCategories.category = CategorizedAccounts.category
+GROUP BY AllCategories.category;
+
+```
+--------------------------
+# Subqueries
